@@ -55,9 +55,6 @@
     <br>
     <br>
     <br>
-    <br>
-    <br>
-    <br>
 
    </div>
 
@@ -96,30 +93,56 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   
     <script>
-      	var key = GetURLParameter('key');
-      	if(key != ""){
-	        document.getElementById("keytool").innerHTML = key;
+        // Hàm tạo key ngẫu nhiên
+        function generateKey() {
+            var randomKey = Math.random().toString(36).substring(2, 10);
+            return randomKey;
         }
-      
-        function GetURLParameter(sParam) {
-            var sPageURL = window.location.search.substring(1);
-            var sURLVariables = sPageURL.split('&');
-            for (var i = 0; i < sURLVariables.length; i++) {
-                var sParameterName = sURLVariables[i].split('=');
-                if (sParameterName[0] == sParam) {
-                    return sParameterName[1];
-                }
+
+        // Lưu trữ key và ngày cuối cùng tạo key vào local storage
+        function storeKeyAndDate() {
+            var currentDate = new Date().toLocaleDateString('vi'); // Lấy ngày hiện tại dạng dd/mm/yyyy
+            var newKey = generateKey();
+            localStorage.setItem('lastKeyDate', currentDate);
+            localStorage.setItem('storedKey', newKey);
+        }
+
+        // Kiểm tra và tạo key mới nếu là ngày mới
+        function checkAndUpdateKey() {
+            var storedDate = localStorage.getItem('lastKeyDate');
+            var currentDate = new Date().toLocaleDateString('vi'); // Lấy ngày hiện tại dạng dd/mm/yyyy
+
+            if (!storedDate || storedDate !== currentDate) {
+                storeKeyAndDate();
             }
         }
+
+        // Lấy key từ local storage
+        function getKeyFromStorage() {
+            return localStorage.getItem('storedKey') || "BẠN CHƯA LẤY KEY";
+        }
+
+        // Cập nhật key lên trang web
+        function updateKeyOnPage() {
+            var key = getKeyFromStorage();
+            document.getElementById("keytool").innerHTML = key;
+        }
+
+        // Sao chép key vào clipboard
         function copyToClipboard(element) {
+            var key = getKeyFromStorage();
             var $temp = $("<input>");
             $("body").append($temp);
-            $temp.val($(element).text()).select();
+            $temp.val(key).select();ư
             document.execCommand("copy");
             $temp.remove();
             
-            return confirm('Bạn Đã Copy Key');
+            alert('Bạn đã sao chép key thành công: ' + key);
         }
+
+        // Gọi hàm để kiểm tra và cập nhật key vào mỗi lần trang được load
+        checkAndUpdateKey();
+        updateKeyOnPage();
     </script>
 </body>
 </html>
